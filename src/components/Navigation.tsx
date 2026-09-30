@@ -2,19 +2,19 @@
 
 import { useRouter } from 'next/navigation';
 import { LayoutDashboard, History, PieChart, LogOut, Wallet } from 'lucide-react';
-import { NavigationProps } from '@/types';
+import { NavigationProps, TabType } from '@/types';
 import { supabase } from '@/lib/supbase';
+
 export default function Navigation({ activeTab, setActiveTab }: NavigationProps) {
   const router = useRouter();
 
-  // Clean Logout Handler
   const handleLogout = async () => {
     await supabase.auth.signOut();
     router.push('/login');
     router.refresh();
   };
 
-  const navItems = [
+  const navItems: { id: TabType; label: string; icon: typeof LayoutDashboard }[] = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { id: 'history', label: 'History', icon: History },
     { id: 'analytics', label: 'Analytics', icon: PieChart },
@@ -25,7 +25,6 @@ export default function Navigation({ activeTab, setActiveTab }: NavigationProps)
       {/* 1. Desktop Left Sidebar */}
       <aside className="hidden lg:flex flex-col justify-between w-64 bg-zinc-900/80 border-r border-zinc-800 p-6 h-screen sticky top-0 shrink-0">
         <div className="space-y-8">
-          {/* Logo / Brand */}
           <div className="flex items-center gap-3 px-2">
             <div className="p-2.5 bg-emerald-500/10 border border-emerald-500/20 rounded-2xl text-emerald-400">
               <Wallet size={22} />
@@ -36,7 +35,6 @@ export default function Navigation({ activeTab, setActiveTab }: NavigationProps)
             </div>
           </div>
 
-          {/* Navigation Links */}
           <nav className="space-y-2">
             {navItems.map((item) => {
               const Icon = item.icon;
@@ -59,7 +57,6 @@ export default function Navigation({ activeTab, setActiveTab }: NavigationProps)
           </nav>
         </div>
 
-        {/* Desktop Logout Button */}
         <button
           onClick={handleLogout}
           className="w-full flex items-center gap-3.5 px-4 py-3 rounded-2xl text-xs font-semibold text-rose-400 hover:bg-rose-500/10 border border-transparent hover:border-rose-500/20 transition cursor-pointer"
@@ -88,7 +85,6 @@ export default function Navigation({ activeTab, setActiveTab }: NavigationProps)
           );
         })}
 
-        {/* Mobile Logout Button */}
         <button
           onClick={handleLogout}
           className="flex flex-col items-center gap-1 p-2 rounded-xl text-[10px] font-medium text-rose-400 hover:text-rose-300 transition cursor-pointer"

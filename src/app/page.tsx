@@ -11,9 +11,9 @@ import {
 import Navigation from "@/components/Navigation";
 import { ExportShare } from "@/components/ExportShare";
 import BudgetSummary from "@/components/BudgetSummary";
-import { HeaderProfile } from "@/components/HeaderProfile.";
 import ExpenseForm from "@/components/ExpenseForm";
 import ExpenseList from "@/components/ExpenseList";
+import { HeaderProfile } from "@/components/HeaderProfile";
 import { Expense } from "@/types";
 import ExpenseFilter from "@/components/ExpenseFilter";
 import DailyLimit from "@/components/DailyLimit";
