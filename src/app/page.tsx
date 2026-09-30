@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useMemo } from "react";
 import { supabase } from "@/lib/supbase";
+import { useRouter } from "next/navigation";
 import {
   getUserDataFromSupabase,
   saveBudgetToSupabase,
@@ -40,27 +41,35 @@ export default function Home() {
       return matchesSearch && matchesCategory;
     });
   }, [expenses, searchQuery, selectedCategory]);
+
+  const router = useRouter()
   useEffect(() => {
-    const initData = async () => {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-      if (session?.user) {
-        const uId = session.user.id;
-        setUserId(uId);
+  const initData = async () => {
+    // 1. Current Session check karein
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
 
-        const { monthlyBudget: fetchedBudget, expenses: fetchedExpenses } =
-          await getUserDataFromSupabase(uId);
+    // 2. Agar session / user nahi hai, toh Login page par redirect kar dein
+    if (!session?.user) {
+      router.push("/login"); // (Ya jo bhi aapka login page route ho)
+      return;
+    }
 
-        setMonthlyBudget(fetchedBudget);
-        setExpenses(fetchedExpenses);
-      }
-      setLoading(false);
-    };
+    // 3. Agar user logged in hai, toh unka data load karein
+    const uId = session.user.id;
+    setUserId(uId);
 
-    initData();
-  }, []);
+    const { monthlyBudget: fetchedBudget, expenses: fetchedExpenses } =
+      await getUserDataFromSupabase(uId);
 
+    setMonthlyBudget(fetchedBudget);
+    setExpenses(fetchedExpenses);
+    setLoading(false);
+  };
+
+  initData();
+}, [router]);
   const handleSetMonthlyBudget = async (newBudget: number) => {
     setMonthlyBudget(newBudget);
     if (userId) {
