@@ -10,12 +10,9 @@ interface ExportShareProps {
 }
 
 export function ExportShare({ expenses, monthlyBudget, totalSpent }: ExportShareProps) {
-  // 1. Functional PDF Generator / Print View
+  // 1. Functional PDF Generator / Print View (Fixed Popup Blocker Issue)
   const handlePDFDownload = () => {
     if (!expenses.length) return;
-
-    const printWindow = window.open("", "_blank");
-    if (!printWindow) return;
 
     const remaining = monthlyBudget - totalSpent;
 
@@ -32,7 +29,8 @@ export function ExportShare({ expenses, monthlyBudget, totalSpent }: ExportShare
       )
       .join("");
 
-    printWindow.document.write(`
+    const printContent = `
+      <!DOCTYPE html>
       <html>
         <head>
           <title>Expense Tracker Statement</title>
@@ -69,16 +67,26 @@ export function ExportShare({ expenses, monthlyBudget, totalSpent }: ExportShare
               ${itemsHtml}
             </tbody>
           </table>
-          <script>
-            window.onload = () => { window.print(); window.close(); }
-          </script>
         </body>
       </html>
-    `);
-    printWindow.document.close();
+    `;
+
+    // Window open inside click handler to bypass popup blockers
+    const printWindow = window.open("about:blank", "_blank");
+    if (printWindow) {
+      printWindow.document.open();
+      printWindow.document.write(printContent);
+      printWindow.document.close();
+
+      // Ensure assets load before triggering print
+      setTimeout(() => {
+        printWindow.focus();
+        printWindow.print();
+      }, 250);
+    }
   };
 
-  // 2. Formatted WhatsApp Message Share
+  // 2. Reliable WhatsApp Message Share (Fixed Scheme for PWA & Mobile)
   const handleWhatsAppShare = () => {
     const remaining = monthlyBudget - totalSpent;
     const text = 
@@ -91,7 +99,11 @@ export function ExportShare({ expenses, monthlyBudget, totalSpent }: ExportShare
 ━━━━━━━━━━━━━━━━━━━━
 *Synced via ExpenseTrack App*`;
 
-    window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank");
+    const encodedText = encodeURIComponent(text);
+    const whatsappUrl = `https://api.whatsapp.com/send?text=${encodedText}`;
+
+    // Direct redirection works reliably in PWA / Mobile browsers
+    window.location.href = whatsappUrl;
   };
 
   return (
