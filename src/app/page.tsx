@@ -56,6 +56,11 @@ export default function Home() {
       return;
     }
 
+    // 2. YAHAN YEH LINE ADD KAREIN: Token waali gandi URL ko clean karein
+    if (window.location.hash || window.location.search.includes("code=")) {
+      window.history.replaceState(null, "", window.location.pathname);
+    }
+    
     // 3. Agar user logged in hai, toh unka data load karein
     const uId = session.user.id;
     setUserId(uId);

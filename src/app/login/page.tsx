@@ -84,17 +84,19 @@ export default function AuthPage() {
 
   // Google OAuth Handler
   const handleGoogleLogin = async () => {
-    setErrorMessage(null);
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
-      },
-    });
+  setErrorMessage(null);
+  const { error } = await supabase.auth.signInWithOAuth({
+    provider: 'google',
+    options: {
+      // /auth/callback HATA KAR DIRECT ROOT '/' PATH DEIN:
+      redirectTo: `${window.location.origin}/`,
+    },
+  });
 
-    if (error) setErrorMessage(error.message);
-  };
-
+  if (error) {
+    setErrorMessage(error.message);
+  }
+};
   return (
     <div className="min-h-screen bg-zinc-950 text-white flex items-center justify-center p-4">
       <div className="w-full max-w-md bg-zinc-900 border border-zinc-800 rounded-3xl p-6 sm:p-8 shadow-2xl space-y-6">
