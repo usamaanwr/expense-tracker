@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata , Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
@@ -14,12 +14,19 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+// App Info & Manifest Link
 export const metadata: Metadata = {
-  title: 'ExpenseTrack - Smart Budget Manager',
-  description: 'Manage your daily expenses seamlessly',
-  manifest: '/manifest.json',
-  themeColor: '#10b981',
-  viewport: 'width=device-width, initial-scale=1, maximum-scale=1'
+  title: "ExpenseTrack - Smart Budget Manager",
+  description: "Real-time Glassmorphic Budget & Expense Tracker",
+  manifest: "/manifest.json",
+};
+
+// Mobile Status Bar Color Setup (Matches Zinc-950)
+export const viewport: Viewport = {
+  themeColor: "#09090b",
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
