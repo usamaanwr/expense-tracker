@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@react-pdf/renderer": "^4.9.0",
+    "@supabase/auth-helpers-nextjs": "^0.15.0",
     "@supabase/supabase-js": "^2.117.2",
     "jspdf": "^4.2.1",
     "jspdf-autotable": "^5.0.8",
