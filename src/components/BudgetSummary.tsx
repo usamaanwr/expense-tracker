@@ -35,7 +35,6 @@ export default function BudgetSummary({
     setIsEditing(false);
   };
 
-  // Handle Save on 'Enter' key press
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
       handleSaveBudget();
@@ -43,19 +42,18 @@ export default function BudgetSummary({
   };
 
   return (
-    <div className="w-full space-y-4 my-4">
+    <div className="w-full h-full flex flex-col justify-between space-y-4">
       {/* Over-Budget Alert Banner */}
       {isOverBudget && (
-        <div className="bg-rose-950/80 border border-rose-800/80 text-rose-200 px-5 py-3.5 rounded-2xl flex items-center justify-between shadow-xl animate-pulse">
+        <div className="bg-rose-950/80 border border-rose-800/80 text-rose-200 px-5 py-3 rounded-2xl flex items-center justify-between shadow-xl animate-pulse">
           <div className="flex items-center gap-3">
-            <AlertTriangle className="text-rose-400 shrink-0" size={22} />
+            <AlertTriangle className="text-rose-400 shrink-0" size={20} />
             <div>
-              <p className="text-sm font-bold text-rose-100">
+              <p className="text-xs font-bold text-rose-100">
                 Over-Budget Alert!
               </p>
-              <p className="text-xs text-rose-300">
-                You have exceeded your monthly budget by Rs{" "}
-                {Math.abs(remainingBalance).toLocaleString()}!
+              <p className="text-[11px] text-rose-300">
+                Exceeded limit by Rs {Math.abs(remainingBalance).toLocaleString()}
               </p>
             </div>
           </div>
@@ -63,12 +61,13 @@ export default function BudgetSummary({
       )}
 
       {/* Main Container */}
-      <div className="bg-gradient-to-b from-zinc-900 via-zinc-900 to-zinc-950 border border-zinc-800 rounded-3xl p-6 md:p-8 shadow-2xl relative overflow-hidden">
+      <div className="h-full bg-zinc-900/60 border border-zinc-800/80 backdrop-blur-xl rounded-3xl p-6 shadow-2xl flex flex-col justify-between relative overflow-hidden space-y-6">
+        
         {/* Top Header */}
-        <div className="flex justify-between items-center mb-6">
-          <div className="flex items-center gap-2.5 text-zinc-400 text-sm font-medium">
+        <div className="flex justify-between items-center">
+          <div className="flex items-center gap-2.5 text-zinc-400 text-xs font-semibold uppercase tracking-wider">
             <div className="p-2 bg-emerald-500/10 rounded-xl border border-emerald-500/20">
-              <Wallet size={18} className="text-emerald-400" />
+              <Wallet size={16} className="text-emerald-400" />
             </div>
             <span>Monthly Budget Overview</span>
           </div>
@@ -77,10 +76,10 @@ export default function BudgetSummary({
           {isEditing ? (
             <button
               onClick={handleSaveBudget}
-              className="flex items-center gap-1.5 bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 text-xs md:text-sm px-4 py-1.5 rounded-xl font-semibold hover:bg-emerald-500/30 transition shadow-lg cursor-pointer"
+              className="flex items-center gap-1.5 bg-emerald-500 text-zinc-950 text-xs px-3.5 py-1.5 rounded-xl font-bold hover:bg-emerald-400 transition shadow-lg cursor-pointer"
             >
-              <Check size={16} />
-              <span>Save Budget</span>
+              <Check size={14} />
+              <span>Save</span>
             </button>
           ) : (
             <button
@@ -88,41 +87,40 @@ export default function BudgetSummary({
                 setTempBudget(monthlyBudget.toString());
                 setIsEditing(true);
               }}
-              className="flex items-center gap-1.5 text-zinc-300 hover:text-white text-xs md:text-sm bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 px-4 py-1.5 rounded-xl font-medium transition shadow cursor-pointer"
+              className="flex items-center gap-1.5 text-zinc-300 hover:text-white text-xs bg-zinc-800/80 hover:bg-zinc-800 border border-zinc-700/60 px-3 py-1.5 rounded-xl font-medium transition cursor-pointer"
             >
-              <Edit3 size={14} className="text-emerald-400" />
+              <Edit3 size={13} className="text-emerald-400" />
               <span>Edit Limit</span>
             </button>
           )}
         </div>
 
         {/* Amount Display / Input */}
-        {/* Amount Display / Input */}
-        <div className="mb-8">
+        <div className="space-y-1">
           {isEditing ? (
             <div className="space-y-2">
-              <label className="text-xs text-zinc-400 font-medium">
-                Set New Monthly Budget (Press Enter to save):
+              <label className="text-[11px] text-zinc-400 font-medium">
+                Set Budget Limit (Press Enter):
               </label>
-              <div className="flex items-center gap-3">
-                <span className="text-2xl font-bold text-zinc-400">Rs</span>
+              <div className="flex items-center gap-2">
+                <span className="text-xl font-bold text-zinc-400 font-mono">Rs</span>
                 <input
                   type="number"
                   value={tempBudget}
                   onChange={(e) => setTempBudget(e.target.value)}
                   onKeyDown={handleKeyDown}
-                  className="bg-zinc-800/90 border border-zinc-700 text-xl md:text-2xl font-bold text-white rounded-2xl px-4 py-2.5 w-full md:max-w-md focus:outline-none focus:border-emerald-500 transition placeholder:font-normal placeholder:text-sm placeholder:text-zinc-500 cursor-text [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                  placeholder="Enter budget limit..."
+                  className="bg-zinc-950/80 border border-emerald-500/50 text-xl font-bold text-white rounded-xl px-3.5 py-2 w-full focus:outline-none focus:ring-1 focus:ring-emerald-500/30 transition font-mono"
+                  placeholder="Enter limit..."
                   autoFocus
                 />
               </div>
             </div>
           ) : (
             <div>
-              <p className="text-xs text-zinc-400 mb-1 font-medium">
+              <p className="text-[11px] text-zinc-500 font-medium uppercase tracking-wide">
                 Assigned Monthly Budget
               </p>
-              <h1 className="text-3xl md:text-5xl font-black text-white tracking-tight">
+              <h1 className="text-3xl font-extrabold text-white tracking-tight font-mono">
                 Rs {monthlyBudget.toLocaleString()}
               </h1>
             </div>
@@ -130,24 +128,26 @@ export default function BudgetSummary({
         </div>
 
         {/* Dynamic Progress Bar */}
-        <div className="space-y-2 mb-8">
-          <div className="flex justify-between text-xs md:text-sm font-semibold">
-            <span className="text-zinc-400">
+        <div className="space-y-1.5">
+          <div className="flex justify-between text-xs font-semibold">
+            <span className="text-zinc-400 font-mono">
               Spent: Rs {totalSpent.toLocaleString()}
             </span>
             <span
-              className={isOverBudget ? "text-rose-400" : "text-emerald-400"}
+              className={`font-mono ${
+                isOverBudget ? "text-rose-400" : "text-emerald-400"
+              }`}
             >
               {spentPercentage}% Spent
             </span>
           </div>
 
-          <div className="h-3.5 w-full bg-zinc-800/80 rounded-full overflow-hidden p-0.5 border border-zinc-700/50 shadow-inner">
+          <div className="h-2.5 w-full bg-zinc-950 rounded-full overflow-hidden p-0.5 border border-zinc-800">
             <div
               className={`h-full rounded-full transition-all duration-500 ${
                 isOverBudget
                   ? "bg-gradient-to-r from-rose-500 to-red-600"
-                  : "bg-gradient-to-r from-emerald-500 via-teal-400 to-emerald-400"
+                  : "bg-gradient-to-r from-emerald-500 to-teal-400"
               }`}
               style={{ width: `${spentPercentage}%` }}
             ></div>
@@ -155,35 +155,32 @@ export default function BudgetSummary({
         </div>
 
         {/* Sub Stats Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-6 border-t border-zinc-800/80">
-          <div className="bg-zinc-950/60 border border-zinc-800/80 p-4 rounded-2xl flex items-center justify-between">
-            <div>
-              <div className="flex items-center gap-1.5 text-zinc-400 text-xs mb-1">
-                <TrendingDown size={14} className="text-rose-400" />
-                <span>Total Spent</span>
-              </div>
-              <p className="text-lg md:text-xl font-bold text-zinc-100">
-                Rs {totalSpent.toLocaleString()}
-              </p>
+        <div className="grid grid-cols-2 gap-3 pt-3 border-t border-zinc-800/60">
+          <div className="bg-zinc-950/60 border border-zinc-800/80 p-3 rounded-2xl">
+            <div className="flex items-center gap-1.5 text-zinc-400 text-[11px] mb-0.5 font-medium">
+              <TrendingDown size={13} className="text-rose-400" />
+              <span>Total Spent</span>
             </div>
+            <p className="text-sm font-bold text-zinc-100 font-mono">
+              Rs {totalSpent.toLocaleString()}
+            </p>
           </div>
 
-          <div className="bg-zinc-950/60 border border-zinc-800/80 p-4 rounded-2xl flex items-center justify-between">
-            <div>
-              <div className="flex items-center gap-1.5 text-zinc-400 text-xs mb-1">
-                <DollarSign size={14} className="text-emerald-400" />
-                <span>Remaining Balance</span>
-              </div>
-              <p
-                className={`text-lg md:text-xl font-bold ${
-                  remainingBalance < 0 ? "text-rose-400" : "text-emerald-400"
-                }`}
-              >
-                Rs {remainingBalance.toLocaleString()}
-              </p>
+          <div className="bg-zinc-950/60 border border-zinc-800/80 p-3 rounded-2xl">
+            <div className="flex items-center gap-1.5 text-zinc-400 text-[11px] mb-0.5 font-medium">
+              <DollarSign size={13} className="text-emerald-400" />
+              <span>Remaining</span>
             </div>
+            <p
+              className={`text-sm font-bold font-mono ${
+                remainingBalance < 0 ? "text-rose-400" : "text-emerald-400"
+              }`}
+            >
+              Rs {remainingBalance.toLocaleString()}
+            </p>
           </div>
         </div>
+
       </div>
     </div>
   );
