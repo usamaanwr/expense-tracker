@@ -1,10 +1,7 @@
-'use client';
+"use client";
 
-import React from 'react';
-import { Download, Share2 } from 'lucide-react';
-import jsPDF from 'jspdf';
-import autoTable from 'jspdf-autotable';
-import { Expense } from '@/types';
+import { Download, Share2 } from "lucide-react";
+import { Expense } from "@/types";
 
 interface ExportShareProps {
   expenses: Expense[];
@@ -13,71 +10,110 @@ interface ExportShareProps {
 }
 
 export function ExportShare({ expenses, monthlyBudget, totalSpent }: ExportShareProps) {
-  
-  // Download PDF Report
-  const handleDownloadPDF = () => {
-    const doc = new jsPDF();
-    doc.setFontSize(18);
-    doc.text('ExpenseTrack - Monthly Financial Summary', 14, 20);
+  // 1. Functional PDF Generator / Print View
+  const handlePDFDownload = () => {
+    if (!expenses.length) return;
 
-    doc.setFontSize(11);
-    doc.text(`Total Monthly Budget: Rs ${monthlyBudget.toLocaleString()}`, 14, 30);
-    doc.text(`Total Amount Spent: Rs ${totalSpent.toLocaleString()}`, 14, 37);
-    doc.text(`Remaining Balance: Rs ${(monthlyBudget - totalSpent).toLocaleString()}`, 14, 44);
+    const printWindow = window.open("", "_blank");
+    if (!printWindow) return;
 
-    const tableData = expenses.map((e, index) => [
-      index + 1,
-      e.title,
-      e.category,
-      `Rs ${e.amount.toLocaleString()}`,
-      e.date || 'N/A',
-    ]);
+    const remaining = monthlyBudget - totalSpent;
 
-    autoTable(doc, {
-      startY: 52,
-      head: [['#', 'Title', 'Category', 'Amount', 'Date']],
-      body: tableData,
-      theme: 'grid',
-      headStyles: { fillColor: [16, 185, 129] },
-    });
+    const itemsHtml = expenses
+      .map(
+        (item) => `
+        <tr style="border-bottom: 1px solid #27272a;">
+          <td style="padding: 10px; color: #e4e4e7;">${item.date || "N/A"}</td>
+          <td style="padding: 10px; color: #ffffff; font-weight: 600;">${item.title}</td>
+          <td style="padding: 10px; color: #a1a1aa;">${item.category}</td>
+          <td style="padding: 10px; color: #10b981; font-weight: 700; text-align: right;">Rs ${item.amount.toLocaleString()}</td>
+        </tr>
+      `
+      )
+      .join("");
 
-    doc.save(`Expense_Report_${new Date().toISOString().split('T')[0]}.pdf`);
+    printWindow.document.write(`
+      <html>
+        <head>
+          <title>Expense Tracker Statement</title>
+          <style>
+            body { font-family: monospace, sans-serif; background: #09090b; color: #fff; padding: 30px; }
+            h2 { color: #10b981; margin-bottom: 5px; }
+            .summary { background: #18181b; padding: 15px; border-radius: 10px; margin-bottom: 20px; border: 1px solid #27272a; }
+            table { width: 100%; border-collapse: collapse; font-size: 13px; }
+            th { text-align: left; padding: 10px; background: #27272a; color: #a1a1aa; }
+          </style>
+        </head>
+        <body>
+          <h2>ExpenseTrack Statement</h2>
+          <p style="color: #a1a1aa; font-size: 11px; margin-top: 0;">Generated Report</p>
+          
+          <div class="summary">
+            <p style="margin: 3px 0;"><strong>Monthly Budget:</strong> Rs ${monthlyBudget.toLocaleString()}</p>
+            <p style="margin: 3px 0;"><strong>Total Spent:</strong> Rs ${totalSpent.toLocaleString()}</p>
+            <p style="margin: 3px 0; color: ${remaining < 0 ? "#f43f5e" : "#10b981"}">
+              <strong>Remaining Balance:</strong> Rs ${remaining.toLocaleString()}
+            </p>
+          </div>
+
+          <table>
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Title</th>
+                <th>Category</th>
+                <th style="text-align: right;">Amount</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${itemsHtml}
+            </tbody>
+          </table>
+          <script>
+            window.onload = () => { window.print(); window.close(); }
+          </script>
+        </body>
+      </html>
+    `);
+    printWindow.document.close();
   };
 
-  // WhatsApp Share Report
-  const handleShareWhatsApp = () => {
-    let message = `📊 *ExpenseTrack Monthly Report*\n\n`;
-    message += `💰 *Budget:* Rs ${monthlyBudget.toLocaleString()}\n`;
-    message += `📉 *Total Spent:* Rs ${totalSpent.toLocaleString()}\n`;
-    message += `💵 *Remaining:* Rs ${(monthlyBudget - totalSpent).toLocaleString()}\n\n`;
-    message += `*Recent Transactions (${expenses.length}):*\n`;
+  // 2. Formatted WhatsApp Message Share
+  const handleWhatsAppShare = () => {
+    const remaining = monthlyBudget - totalSpent;
+    const text = 
+`📊 *ExpenseTrack Summary Report*
+━━━━━━━━━━━━━━━━━━━━
+💰 *Monthly Budget:* Rs ${monthlyBudget.toLocaleString()}
+💸 *Total Spent:* Rs ${totalSpent.toLocaleString()}
+⚖️ *Remaining:* Rs ${remaining.toLocaleString()}
+📦 *Total Entries:* ${expenses.length}
+━━━━━━━━━━━━━━━━━━━━
+*Synced via ExpenseTrack App*`;
 
-    expenses.slice(0, 5).forEach((e) => {
-      message += `• ${e.title} - Rs ${e.amount.toLocaleString()} (${e.category})\n`;
-    });
-
-    const url = `https://wa.me/?text=${encodeURIComponent(message)}`;
-    window.open(url, '_blank');
+    window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank");
   };
 
   return (
     <div className="flex items-center gap-2">
       <button
-        onClick={handleDownloadPDF}
-        className="flex items-center gap-1.5 bg-zinc-800/80 hover:bg-zinc-700 border border-zinc-700/80 px-3 py-1.5 rounded-xl text-xs font-semibold text-zinc-200 hover:text-white transition shadow cursor-pointer"
-        title="Download PDF Report"
+        type="button"
+        onClick={handlePDFDownload}
+        className="flex items-center gap-2 px-3.5 py-2 bg-zinc-900/80 border border-zinc-800 hover:border-zinc-700 hover:bg-zinc-800/80 rounded-xl text-xs font-bold text-zinc-300 hover:text-white transition shadow-sm cursor-pointer active:scale-95"
+        title="Export Statement"
       >
-        <Download size={14} className="text-emerald-400" />
-        <span className="hidden sm:inline">PDF</span>
+        <Download className="w-3.5 h-3.5 text-emerald-400" />
+        <span>Export PDF</span>
       </button>
 
       <button
-        onClick={handleShareWhatsApp}
-        className="flex items-center gap-1.5 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 px-3 py-1.5 rounded-xl text-xs font-semibold transition shadow cursor-pointer"
-        title="Share via WhatsApp"
+        type="button"
+        onClick={handleWhatsAppShare}
+        className="flex items-center gap-2 px-3.5 py-2 bg-emerald-500/10 border border-emerald-500/20 hover:bg-emerald-500/20 rounded-xl text-xs font-bold text-emerald-400 transition shadow-sm cursor-pointer active:scale-95"
+        title="Share Breakdown via WhatsApp"
       >
-        <Share2 size={14} />
-        <span className="hidden sm:inline">WhatsApp</span>
+        <Share2 className="w-3.5 h-3.5" />
+        <span>Share</span>
       </button>
     </div>
   );
